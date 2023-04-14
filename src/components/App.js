@@ -1,35 +1,43 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useCallback } from 'react';
 import '../styles/App.css';
 
-
-const isArmstrongNumber = (number) => {
-  console.log("Expensive calculation execution");
-  const numberOfDigits = `${number}`.length;
+const isArmstrongNumber = (num) => {
+  console.log('Expensive calculation execution');
+  const digits = num.toString().split('');
+  const numDigits = digits.length;
   let sum = 0;
-  let temp = number;
-  while (temp > 0) {
-    let remainder = temp % 10;
-    sum += remainder ** numberOfDigits;
-    temp = parseInt(temp / 10);
-   }
-  return sum === number;
+  digits.forEach((digit) => {
+    sum += Math.pow(parseInt(digit), numDigits);
+  });
+  return sum === num;
 };
-const App = () => {
-  const [num, setNum] = useState('');
-  const [count, setCount] = useState(1);
-  const isArmstrong = isArmstrongNumber(num);
- 
-  return (
-    <div className="App">
-      <input id='input' value={num} onChange={(e) => setNum(+e.target.value)}/>
-      <h2 id='answer'>{num ? (isArmstrong ? `${num} is armstrong` : `${num} is not armstrong`) : `Please Enter Number `}</h2>
-      <h4 id='count'onClick={() => { setCount((count) => count + 1);}}>
-        Click me to increase count:-  {count}
-      </h4>
 
+const App = () => {
+  const [inputValue, setInputValue] = useState('');
+  const [isArmstrong, setIsArmstrong] = useState(false);
+  const [count, setCount] = useState(0);
+
+  const onInputChange = useCallback((event) => {
+    const newValue = event.target.value;
+    setInputValue(newValue);
+    setIsArmstrong(isArmstrongNumber(parseInt(newValue)));
+  }, []);
+
+  const onHeaderClick = useCallback(() => {
+    setCount((count) => count + 1);
+  }, []);
+
+  return (
+    <div id="main">
+      <h1 id="count" onClick={onHeaderClick}>
+        {count}
+      </h1>
+      <div>
+        <input id="input" type="text" value={inputValue} onChange={onInputChange} />
+        <p>{isArmstrong ? 'Armstrong Number' : 'Not an Armstrong Number'}</p>
+      </div>
     </div>
   );
-}
-
+};
 
 export default App;
